@@ -5,12 +5,23 @@
   "main": "electron/main.js",
   "scripts": {
     "start": "electron ./electron/main.js",
+    "build": "babel react --out-dir ./build",
+    "watch": "babel --watch react --out-dir ./build",
     "clean": "rm -rf ./node_modules"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "electron": "^20.1.3",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.1",
+    "@babel/preset-env": "^7.19.1",
+    "@babel/preset-react": "^7.18.6",
+    "babel-cli": "^6.26.0"
   }
 }

@@ -1,30 +1,22 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow } = require("electron");
 const path = require("path");
-
-// Rust's NodeJS API
-const rust = require("../../lib/index.node");
-
-// Allow's calling of rust api's via
-ipcMain.handle("rust", function (_, func, ...args) {
-  if (!(rust[func] instanceof Function)) {
-    throw new TypeError(`"${func}" is not a function`);
-  }
-  return rust[func](...args);
-});
 
 function createWindow() {
   win = new BrowserWindow({
     width: 1080,
     height: 720,
     webPreferences: {
+      // Required to allow React to be imported to render in the render processes
+      // This allows filesystem access via require()
+      sandbox: false,
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
-  win.loadFile("index.html");
+  win.loadFile("../public/index.html");
 
   // Auto open DevTools.
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 }
 
 app.whenReady().then(createWindow);

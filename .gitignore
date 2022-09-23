@@ -1,5 +1,13 @@
-target
+# Build files
+**/target
+**/build
 index.node
+
+# Libraries
 **/node_modules
-**/.DS_Store
+
+# Debug logs
 npm-debug.log*
+
+# macOS filesystem
+**/.DS_Store

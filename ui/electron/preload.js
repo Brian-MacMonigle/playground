@@ -1,28 +1,19 @@
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, contextBridge } = require("electron");
+const rust = require("../../lib/index.node");
+const ReactDOM = require("react-dom/client");
+const React = require("react");
+const { Root } = require("../build/Root.js");
 
-// Demo injection of node context into webpage
 window.addEventListener("DOMContentLoaded", function () {
-  function replaceText(selector, text) {
-    document.getElementById(selector).innerText = text;
-  }
+  const props = {
+    rust,
+    node: process.versions.node,
+    chrome: process.versions.chrome,
+    electron: process.versions.electron,
+  };
 
-  for (const dependency of ["Chrome", "Node", "Electron"]) {
-    replaceText(
-      dependency.toLowerCase(),
-      `${dependency} version is ${process.versions[dependency.toLowerCase()]}`
-    );
-  }
-
-  // Demo connection of rust lib into webpage securly
-  ipcRenderer
-    .invoke("rust", "hello", "Rust!")
-    .then((text) => replaceText("rust", text))
-    .catch(console.error);
-
-  ipcRenderer.invoke("rust", "none").catch(console.error);
-
-  ipcRenderer
-    .invoke("rust", "hello", 1234)
-    .then(console.log)
-    .catch(console.error);
+  // React entry point
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    React.createElement(Root, props)
+  );
 });
