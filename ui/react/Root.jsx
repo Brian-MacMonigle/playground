@@ -1,5 +1,6 @@
 import React from "react";
 import rust from "../../lib/index.node";
+import { Renderer } from "./components/Renderer";
 
 export function Root(props) {
   return (
@@ -9,6 +10,7 @@ export function Root(props) {
       <div id="chrome">Chrome version: {props.chrome}</div>
       <div id="electron">Electron version: {props.electron}</div>
       <div id="rust">{rust.hello("Rust!")}</div>
+      <Renderer />
     </>
   );
 }

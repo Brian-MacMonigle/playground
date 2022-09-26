@@ -1,22 +1,51 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
+const rust = require("../../lib/index.node");
+
+function initRendererResizeCallback(window) {
+  let cache = { x: 0, y: 0, width: 0, height: 0 };
+  function sendSize(_event, conRect = cache) {
+    cache = conRect;
+    winRect = window.getContentBounds();
+    rust.resize({
+      left: conRect.x + winRect.x,
+      top: conRect.y + winRect.y,
+      contentWidth: conRect.width,
+      contentHeight: conRect.height,
+      windowWidth: winRect.width,
+      windowHeight: winRect.height,
+    });
+  }
+
+  // Send rust new size when React or Electron's window changes size
+  ipcMain.on("renderer-resize", sendSize);
+  window.on("resize", sendSize);
+  window.on("move", sendSize);
+}
 
 function createWindow() {
-  win = new BrowserWindow({
+  window = new BrowserWindow({
     width: 1080,
     height: 720,
+    show: false, // don't render window (wait for 'ready-to-show' event)
+    autoHideMenuBar: true, // don't display 'alt' bar by default
     webPreferences: {
       // Required to allow React to be imported to render in the render processes
       // This allows filesystem access via require()
       sandbox: false,
       preload: path.join(__dirname, "preload.js"),
+      devTools: true, // allow dev tools to be opened
     },
   });
 
-  win.loadFile("../public/index.html");
+  // Open window only when DOM has rendered once
+  window.once("ready-to-show", window.show);
 
-  // Auto open DevTools.
-  win.webContents.openDevTools();
+  initRendererResizeCallback(window);
+
+  window.loadFile("../public/index.html");
+  // Auto open DevTools
+  window.webContents.openDevTools();
 }
 
 app.whenReady().then(createWindow);
